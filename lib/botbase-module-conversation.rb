@@ -19,7 +19,7 @@ class BotBaseModuleConversation
 
     a = run(default_package, default_job)
     
-    @doc = Rexle.new("<conversations></conversations>")
+    @doc = Rexle.new("<conversations/>")
     
     add_phrases(a)
     
@@ -32,7 +32,8 @@ class BotBaseModuleConversation
     if found then
     
       package, job = found.last.split
-      h = said.match(/#{found.first}/).named_captures
+
+      h = said.match(/#{found.first}/i).named_captures
       r = run(package, job)
       
       if r.is_a? String then
@@ -40,6 +41,7 @@ class BotBaseModuleConversation
       elsif r.is_a? Array then
         add_phrases(r)
       end
+      
     else  
       # do or say nothing
       ''
