@@ -16,7 +16,7 @@ class BotBaseModuleConversation
 
 
     @rsc = RSC.new host, package_src
-
+    
     a = run(default_package, default_job)
     
     @doc = Rexle.new("<conversations/>")
@@ -34,7 +34,7 @@ class BotBaseModuleConversation
       package, job = found.last.split
 
       h = said.match(/#{found.first}/i).named_captures
-      r = run(package, job)
+      r = run(package, job, h)
       
       if r.is_a? String then
         r
@@ -74,8 +74,8 @@ class BotBaseModuleConversation
     answer
   end
   
-  def run(package, job, args=[])
-    @rsc.send(package.to_sym).method(job.to_sym).call(*args)
+  def run(package, job, h={})
+    @rsc.send(package.to_sym).method(job.to_sym).call(h)
   end
 
 end
