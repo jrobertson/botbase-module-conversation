@@ -20,16 +20,19 @@ class BotBaseModuleConversation
     a = run(default_package, default_job)
     
     @doc = Rexle.new("<conversations/>")
-    
+    puts 'adding phrases : ' + a.inspect
     add_phrases(a)
     
   end
 
-  def query(sender='user01', said)
+  def query(sender='user01', said, mode: :voicechat)
+    puts 'said: ' + said.inspect
     
     found = @phrases.detect {|pattern, _|  said =~ /#{pattern}/i }
-
+    
     if found then
+      
+      puts 'found: ' +found.inspect
     
       package, job = found.last.split
 
@@ -43,10 +46,16 @@ class BotBaseModuleConversation
       end
       
     else  
-      # do or say nothing
-      ''
+      no_match_found()
     end
     
+  end
+  
+  protected
+  
+  def no_match_found()
+    # do or say nothing
+    ''    
   end
   
   private
@@ -75,6 +84,7 @@ class BotBaseModuleConversation
   end
   
   def run(package, job, h={})
+    puts 'package: ' + package.inspect
     @rsc.send(package.to_sym).method(job.to_sym).call(h)
   end
 
