@@ -12,9 +12,9 @@ require 'rexle-builder'
 class BotBaseModuleConversation
   
   def initialize(host: nil, package_src: nil, 
-                 default_package: nil, default_job: nil)    
+              default_package: nil, default_job: nil, callback: nil)    
 
-
+    @bot = callback
     @rsc = RSC.new host, package_src
     
     a = run(default_package, default_job)
@@ -22,6 +22,7 @@ class BotBaseModuleConversation
     @doc = Rexle.new("<conversations/>")
     #puts 'adding phrases : ' + a.inspect
     add_phrases(a)
+
     
   end
 
@@ -33,6 +34,7 @@ class BotBaseModuleConversation
     
     if found then
       
+      notice 'botbase/debug: module-conversation queried, found ' + found[0]
       #puts 'found: ' +found.inspect
     
       package, job = found.last.split
@@ -84,8 +86,13 @@ class BotBaseModuleConversation
     answer
   end
   
+  def notice(msg)
+    @bot.debug msg if @bot
+  end
+  
   def run(package, job, h={})
     puts 'package: ' + package.inspect
+    puts 'h:'  + h.inspect
     @rsc.send(package.to_sym).method(job.to_sym).call(h)
   end
 

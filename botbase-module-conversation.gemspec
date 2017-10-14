@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'botbase-module-conversation'
-  s.version = '0.1.5'
+  s.version = '0.1.6'
   s.summary = 'A botbase module intended for holding a conversation ' + 
       'between the user and the bot. Relies upon a dRB service for ' + 
       'responding to the user\'s statements. Used by the botbase gem.'
