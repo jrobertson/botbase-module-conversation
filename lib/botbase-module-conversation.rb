@@ -20,29 +20,26 @@ class BotBaseModuleConversation
     a = run(default_package, default_job)
     
     @doc = Rexle.new("<conversations/>")
-    #puts 'adding phrases : ' + a.inspect
+
     add_phrases(a)
 
     
   end
 
-  def query(sender='user01', said, mode: :voicechat, echo_node: 'node')
-    
-    #puts 'said: ' + said.inspect
+  def query(sender='user01', said, mode: :voicechat, echo_node: 'node')    
     
     found = @phrases.detect {|pattern, _|  said =~ /#{pattern}/i }
     
     if found then
       
       notice 'botbase/debug: module-conversation queried, found ' + found[0]
-      #puts 'found: ' +found.inspect
     
       package, job = found.last.split
 
       h = said.match(/#{found.first}/i).named_captures
       r = run(package, job, h)
       
-      if r.is_a? String then
+      if r.is_a? String or r.is_a? Hash then
         r
       elsif r.is_a? Array then
         add_phrases(r)
@@ -91,8 +88,6 @@ class BotBaseModuleConversation
   end
   
   def run(package, job, h={})
-    puts 'package: ' + package.inspect
-    puts 'h:'  + h.inspect
     @rsc.send(package.to_sym).method(job.to_sym).call(h)
   end
 
