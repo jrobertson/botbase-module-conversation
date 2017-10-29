@@ -22,7 +22,6 @@ class BotBaseModuleConversation
     @doc = Rexle.new("<conversations/>")
 
     add_phrases(a)
-
     
   end
 
@@ -32,7 +31,10 @@ class BotBaseModuleConversation
     
     if found then
       
-      notice 'botbase/debug: module-conversation queried, found ' + found[0]
+      if @bot.log then
+        @bot.log.info "BotBaseModuleConversation/query:" + 
+            " found %s in response to %s" % [found[0], said]
+      end
     
       package, job = found.last.split
 
@@ -81,10 +83,6 @@ class BotBaseModuleConversation
     end    
     
     answer
-  end
-  
-  def notice(msg)
-    @bot.debug msg if @bot
   end
   
   def run(package, job, h={})
