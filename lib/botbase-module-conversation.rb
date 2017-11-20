@@ -6,6 +6,7 @@
 
 
 require 'rsc'
+require 'json'
 require 'rexle-builder'
 
 
@@ -33,19 +34,40 @@ class BotBaseModuleConversation
       
       if @bot.log then
         @bot.log.info "BotBaseModuleConversation/query:" + 
-            " found %s in response to %s" % [found[0], said]
+            " found %s in response to %s" % [found.inspect, said]
       end
     
-      package, job = found.last.split
+      _, rsc_command, context_tags = found
+      package, job = rsc_command.split
 
       h = said.match(/#{found.first}/i).named_captures
       r = run(package, job, h)
       
-      if r.is_a? String or r.is_a? Hash then
+      a, tags = [], []
+      
+      a << if r.is_a? String then
         r
+      elsif r.is_a? Hash then
+        
+        if r[:msg] then
+          tags.concat r[:tags].split
+          r[:msg]
+        else
+          r
+        end
+        
       elsif r.is_a? Array then
-        add_phrases(r)
+        add_phrases(r)        
       end
+      
+      tags.concat context_tags.split if context_tags
+      a << tags
+      
+      if @bot.log then
+        @bot.log.info "BotBaseModuleConversation/query/result:" + 
+            " result %s in response to %s" % [a.to_json, said]
+      end      
+      a.first
       
     else  
       no_match_found()
@@ -70,7 +92,7 @@ class BotBaseModuleConversation
     @doc.root.delete "conversations[@id='#{id}']"
     
     a2 = a.inject([]) do |r, x|
-      r << {conversation: {user: x[0], bot: x[-1]}}
+      r << {conversation: {user: x[0], bot: x[1], tags: x[2]}}
     end
 
     a3 = RexleBuilder.new({converstions: a2}).to_a
@@ -79,14 +101,21 @@ class BotBaseModuleConversation
     @doc.root.add_element doc.root
 
     @phrases = @doc.root.xpath('//conversation').map do |e|
-      %w(user bot).map {|x| e.text x}
+      %w(user bot tags).map {|x| e.text x}
     end    
     
     answer
   end
   
   def run(package, job, h={})
+    
+    if @bot.log then
+      @bot.log.info "BotBaseModuleConversation/run: " + 
+          "package: %s, method: %s, args: %s" % [package, job, h.inspect]
+    end    
+    
     @rsc.send(package.to_sym).method(job.to_sym).call(h)
+
   end
 
 end
