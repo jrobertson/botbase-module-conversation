@@ -12,11 +12,11 @@ require 'rexle-builder'
 
 class BotBaseModuleConversation
   
-  def initialize(host: nil, package_src: nil, 
-              default_package: nil, default_job: nil, callback: nil)    
+  def initialize(host: nil, default_package: nil, default_job: nil, 
+                 callback: nil)
 
     @bot = callback
-    @rsc = RSC.new host, package_src
+    @rsc = RSC.new host
     
     a = run(default_package, default_job)
     
@@ -41,15 +41,21 @@ class BotBaseModuleConversation
       package, job = rsc_command.split
 
       h = said.match(/#{found.first}/i).named_captures
+      
+      if @bot.log then
+        @bot.log.info "BotBaseModuleConversation/query:" + 
+            " h: "  + h.inspect
+      end      
+      
       r = run(package, job, h)
       
       a, tags = [], []
-      
+
       a << if r.is_a? String then
         r
       elsif r.is_a? Hash then
         
-        if r[:msg] then
+        if r[:msg] then               
           tags.concat r[:tags].split
           r[:msg]
         else
@@ -61,6 +67,7 @@ class BotBaseModuleConversation
       end
       
       tags.concat context_tags.split if context_tags
+      
       a << tags
       
       if @bot.log then
