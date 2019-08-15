@@ -102,7 +102,7 @@ class BotBaseModuleConversation
       r << {conversation: {user: x[0], bot: x[1], tags: x[2]}}
     end
 
-    a3 = RexleBuilder.new({converstions: a2}).to_a
+    a3 = RexleBuilder.new({converstions: a2}, debug: false).to_a
     doc = Rexle.new(a3[3])
     doc.root.attributes['id'] = id
     @doc.root.add_element doc.root
