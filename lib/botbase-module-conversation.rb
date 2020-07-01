@@ -13,10 +13,9 @@ require 'rexle-builder'
 class BotBaseModuleConversation
   
   def initialize(host: nil, default_package: nil, default_job: nil, 
-                 callback: nil)
+                 callback: nil, debug: false)
 
-    @bot = callback
-    @rsc = RSC.new host
+    @bot, @rsc, @debug = callback, RSC.new(host), debug
     
     a = run(default_package, default_job)
     
